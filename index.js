@@ -52,7 +52,7 @@ function getTweetEmbed(tweet) {
             embed.addField(`url [ ${obj.display_url} ]:`, obj.expanded_url, false)
         }
     )
-    if (entities.media !== []) {
+    if (entities.media) {
         embed.setImage(entities.media[0].media_url_https)
     }
 
