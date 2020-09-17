@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
-const secrets = require('./secrets.json');
 const Twit = require('twit');
+const secrets = require('./secrets.json');
+const follow = require('./follow.json');
 
 const webhookClient = new Discord.WebhookClient(secrets.discord.webhookID, secrets.discord.webhookToken);
 
@@ -15,11 +16,11 @@ const T = new Twit({
 
 
 const stream = T.stream('statuses/filter', {
-    follow: ['8973062', '1305530622576922624']
+    follow: follow.users
 });
-stream.on('tweet', function (tweet, err) {
-    console.log(tweet);
+stream.on('tweet', function (tweet) {
     if (!isReply(tweet)) {
+        console.log(`${tweet.user.name} - ${tweet.id}`);
         webhookClient.send({
             username: 'PING! Monitor',
             embeds: [getTweetEmbed(tweet)],
@@ -38,19 +39,23 @@ function isReply(tweet) {
 }
 
 function getTweetEmbed(tweet) {
+    const user = tweet.user
     let embed = new Discord.MessageEmbed()
         .setColor('#1DA1F2')
         .setTitle('Link to tweet')
-        .setURL(`https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`)
-        .setAuthor(`${tweet.user.name} (@${tweet.user.screen_name})`, tweet.user.profile_image_url_https)
+        .setURL(`https://twitter.com/${user.screen_name}/status/${tweet.id_str}`)
+        .setAuthor(`${user.name} (@${user.screen_name})`, user.profile_image_url_https)
         .addField('Content:', tweet.text, false)
 
-    const urls = tweet.text.match(/\bhttps?:\/\/\S+/gi);
-    if (urls) {
-        urls.forEach((value, index) =>
-            embed.addField(`url [${index}]`, value, false)
-        )
+    const entities = tweet.entities
+    entities.urls.forEach((obj) => {
+            embed.addField(`url [ ${obj.display_url} ]:`, obj.expanded_url, false)
+        }
+    )
+    if (entities.media !== []) {
+        embed.setImage(entities.media[0].media_url_https)
     }
+
     return embed
 }
 
