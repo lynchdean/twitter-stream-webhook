@@ -1,0 +1,18 @@
+{
+  "name": "ping-monitor-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests specified\" "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "twit": "^2.2.11"
+  },
+  "dependencies": {
+    "discord.js": "^12.3.1"
+  }
+}
